@@ -1,0 +1,51 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Auth helpers
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+    
+    // File validation
+    function isValidAudioFile() {
+      return request.resource.contentType.matches('audio/.*') &&
+             request.resource.size < 20 * 1024 * 1024; // 20MB limit
+    }
+    
+    function isValidImageFile() {
+      return request.resource.contentType.matches('image/.*') &&
+             request.resource.size < 5 * 1024 * 1024; // 5MB limit
+    }
+    
+    // Public meditation audio files - read-only
+    match /meditation_audio/{fileName} {
+      allow read: if isSignedIn();
+      allow write: if false; // Only admins can upload
+    }
+    
+    // User-specific files
+    match /users/{userId}/{filePath=**} {
+      allow read: if isOwner(userId);
+      
+      // Audio files
+      allow write: if isOwner(userId) && 
+                    filePath.matches('audio/.*') &&
+                    isValidAudioFile();
+      
+      // Images
+      allow write: if isOwner(userId) && 
+                    filePath.matches('images/.*') &&
+                    isValidImageFile();
+    }
+    
+    // Mood garden graphics - public access
+    match /garden_assets/{fileName} {
+      allow read: if isSignedIn();
+      allow write: if false;
+    }
+  }
+}
