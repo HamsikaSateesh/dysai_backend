@@ -1,62 +1,56 @@
-/**
- * Import function triggers from their respective submodules:
- *
- * const {onCall} = require("firebase-functions/v2/https");
- * const {onDocumentWritten} = require("firebase-functions/v2/firestore");
- *
- * See a full list of supported triggers at https://firebase.google.com/docs/functions
- */
+// functions/index.js
 
-const {onRequest} = require("firebase-functions/v2/https");
-const logger = require("firebase-functions/logger");
-
-// Create and deploy your first functions
-// https://firebase.google.com/docs/functions/get-started
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 admin.initializeApp();
 
-// Import functions from feature modules
-const cyclesFunctions = require('./src/cycles');
-const symptomsFunctions = require('./src/symptoms');
-const predictionsFunctions = require('./src/predictions');
+// Import ML functions
+const painPredictorFunctions = require('./src/ml/painPredictor');
+const syntheticDataFunctions = require('./src/ml/syntheticDataGenerator');
+const cyclesFunctions = require('./src/ml/cycles');
+const moodGardenFunctions = require('./src/ml/moodGarden');
+const predictionsFunctions = require('./src/ml/predictions');
+const settingsFunctions = require('./src/ml/settings');
+const symptomsFunctions = require('./src/ml/symptoms');
+const usersFunctions = require('./src/ml/users');
+const wellnessFunctions = require('./src/ml/wellness');
 
-// Import functions from feature modules
-const moodGardenFunctions = require('./src/moodGarden');
-const wellnessFunctions = require('./src/wellness');
-const settingsFunctions = require('./src/settings');
-const adminFunctions = require('./src/admin');
-const userFunctions = require('./src/users');
+// Export Cycles functions
+exports.startCycle = cyclesFunctions.startCycle;
+exports.endCycle = cyclesFunctions.endCycle;
+exports.getCycleHistory = cyclesFunctions.getCycleHistory;
+exports.getCurrentCycleStats = cyclesFunctions.getCurrentCycleStats;
 
 // Export Mood Garden functions
 exports.logMoodEntry = moodGardenFunctions.logMoodEntry;
 exports.getMoodGarden = moodGardenFunctions.getMoodGarden;
 
-// Export Wellness Activities functions
-exports.getDailyTips = wellnessFunctions.getDailyTips;
-exports.completeWellnessActivity = wellnessFunctions.completeWellnessActivity;
-exports.getWellnessStats = wellnessFunctions.getWellnessStats;
+// Export Pain Prediction functions
+exports.getPainPredictions = predictionsFunctions.getPainPredictions;
+exports.ratePredictionAccuracy = predictionsFunctions.ratePredictionAccuracy;
+exports.updatePredictionModels = predictionsFunctions.updatePredictionModels;
 
-// Export Settings Management functions
+// Export Settings functions
 exports.updateSettings = settingsFunctions.updateSettings;
 exports.getSettings = settingsFunctions.getSettings;
 
-// Export Admin functions
-exports.addTip = adminFunctions.addTip;
-exports.loadInitialTips = adminFunctions.loadInitialTips;
-
-// Export cycle tracking functions
-exports.startCycle = cyclesFunctions.startCycle;
-exports.endCycle = cyclesFunctions.endCycle;
-
-// Export symptom logging functions
+// Export Symptoms functions
 exports.logSymptom = symptomsFunctions.logSymptom;
+exports.getSymptomHistory = symptomsFunctions.getSymptomHistory;
+exports.analyzeSymptoms = symptomsFunctions.analyzeSymptoms;
 
-// Export prediction functions
-exports.predictPain = predictionsFunctions.predictPain;
-exports.updatePredictionsDaily = predictionsFunctions.updatePredictionsDaily;
+// Export User functions
+exports.updateUserProfile = usersFunctions.updateUserProfile;
+exports.getUserProfile = usersFunctions.getUserProfile;
+exports.recordBiosensorData = usersFunctions.recordBiosensorData;
+exports.trackMeditationSession = usersFunctions.trackMeditationSession;
 
-// exports.helloWorld = onRequest((request, response) => {
-//   logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
+// Export Wellness functions
+exports.getDailyTips = wellnessFunctions.getDailyTips;
+exports.completeWellnessActivity = wellnessFunctions.completeWellnessActivity;
+exports.getWellnessStats = wellnessFunctions.getWellnessStats;
+exports.addWellnessTip = wellnessFunctions.addWellnessTip;
+exports.loadInitialTips = wellnessFunctions.loadInitialTips;
+
+// Export Synthetic Data functions for admin use
+exports.generateAndStoreSyntheticDataset = syntheticDataFunctions.generateAndStoreSyntheticDataset;
